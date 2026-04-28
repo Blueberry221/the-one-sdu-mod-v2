@@ -107,7 +107,8 @@ public class SimpleCommunityDetection implements CommunityDetection {
 			 * the size of the peer's familiar set
              */
             
-            System.out.println(peer +" has size com : " +localCommunity.size());
+            // Change back if want see the peer size
+            // System.out.println(peer +" has size com : " +localCommunity.size());
             
             // compute set intersection
             int count = 0, peerFsize = scd.familiarSet.size();

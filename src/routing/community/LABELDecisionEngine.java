@@ -12,19 +12,23 @@ import core.*;
 import routing.*;
 
 /**
- * <p>Implements the LABEL routing protocol described in <em>How Small Labels
+ * <p>
+ * Implements the LABEL routing protocol described in <em>How Small Labels
  * create Big Improvements</em> by Pan Hui and Jon Crowcroft (2007). The authors
  * found that, where nodes self describe their community with some text label,
  * they are more likely to contact nodes with in their community. While the
  * paper doesn't discuss a protocol that uses programmatic community detection
  * techniques, other papers of the authors reference the idea (though do not
  * specifically present it). Thus, this class is a bit of an extrapolation of
- * their various works on the matter.</p>
+ * their various works on the matter.
+ * </p>
  *
- * <p>The protocol has each node only forward message to members of the
+ * <p>
+ * The protocol has each node only forward message to members of the
  * destination's community, i.e. at any given time, if a connected peer declares
  * the destination of a message to be in its local community, then a node
- * decides to transfer the message to that peer.</p>
+ * decides to transfer the message to that peer.
+ * </p>
  *
  * <pre>
  * \@inproceedings{4144796,
@@ -73,8 +77,7 @@ public class LABELDecisionEngine implements RoutingDecisionEngine, CommunityDete
 	 */
 	public LABELDecisionEngine(Settings s) {
 		if (s.contains(COMMUNITY_ALG_SETTING))
-			this.community = (CommunityDetection)
-				s.createIntializedObject(s.getSetting(COMMUNITY_ALG_SETTING));
+			this.community = (CommunityDetection) s.createIntializedObject(s.getSetting(COMMUNITY_ALG_SETTING));
 		else
 			this.community = new SimpleCommunityDetection(s);
 	}
@@ -159,7 +162,8 @@ public class LABELDecisionEngine implements RoutingDecisionEngine, CommunityDete
 	 * local community as the message's destination.
 	 */
 	public boolean shouldSendMessageToHost(Message m, DTNHost otherHost) {
-		if (m.getTo() == otherHost) return true;
+		if (m.getTo() == otherHost)
+			return true;
 
 		DTNHost dest = m.getTo();
 		LABELDecisionEngine de = getOtherDecisionEngine(otherHost);
@@ -190,14 +194,18 @@ public class LABELDecisionEngine implements RoutingDecisionEngine, CommunityDete
 
 	private LABELDecisionEngine getOtherDecisionEngine(DTNHost h) {
 		MessageRouter otherRouter = h.getRouter();
-		assert otherRouter instanceof DecisionEngineRouter :
-			"This router only works with other routers of same type";
+		assert otherRouter instanceof DecisionEngineRouter : "This router only works with other routers of same type";
 
 		return (LABELDecisionEngine) ((DecisionEngineRouter) otherRouter)
-			.getDecisionEngine();
+				.getDecisionEngine();
 	}
 
 	public Set<DTNHost> getLocalCommunity() {
 		return this.community.getLocalCommunity();
+	}
+
+	@Override
+	public int[] getGlobalArrayCentrality() {
+		return new int[0]; // Return array kosong
 	}
 }

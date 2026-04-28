@@ -26,4 +26,5 @@ public interface CentralityDetectionEngine {
 	//return the array of the global centrality of a node
 	//public int [] getArrayCentrality ();
 	
+	public int[] getGlobalArrayCentrality();
 }

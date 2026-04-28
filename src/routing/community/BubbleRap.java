@@ -11,7 +11,7 @@ import routing.DecisionEngineRouter;
 import routing.MessageRouter;
 import routing.RoutingDecisionEngine;
 
-public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngine {
+public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngine, CentralityDetectionEngine {
 
     // Start-initialisation
     public static final String COMMUNITY_ALG_SETTING = "communityDetectAlg"; // added
@@ -44,7 +44,7 @@ public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngin
     public BubbleRap(BubbleRap proto) {
         this.community = proto.community.replicate(); // added
         this.centrality = proto.centrality.replicate();
-        startTimestamps = new HashMap<DTNHost, Double>();
+        this.startTimestamps = new HashMap<DTNHost, Double>();
         connHistory = new HashMap<DTNHost, List<Duration>>();
     }
 
@@ -177,6 +177,22 @@ public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngin
 
     protected double getGlobalCentrality() {
         return this.centrality.getGlobalCentrality(connHistory);
+    }
+
+    @Override
+    public double getGlobalDegreeCentrality() {
+        return this.getGlobalCentrality(); // memanggil method yang sudah ada
+    }
+
+    @Override
+    public double getLocalDegreeCentrality() {
+        return this.getLocalCentrality(); // memanggil method yang sudah ada
+    }
+
+    @Override
+    public int[] getGlobalArrayCentrality() {
+        // Langsung me-return hasil perhitungan array dari objek centrality
+        return this.centrality.getGlobalArrayCentrality(connHistory);
     }
 
     private BubbleRap getOtherDecisionEngine(DTNHost h) {
