@@ -5,7 +5,7 @@ setlocal EnableDelayedExpansion
 set "targetdir=target"
 set "libdir=lib"
 set "mainclass=core.DTNSim"
-set "memory=512M"
+set "memory=1024M"
 :: ^ Modify the memory limit as needed, 512 is kinda low for dtnsim lol, but
 :: this is here to not let dtnsim to hog resources when you want to multitask
 

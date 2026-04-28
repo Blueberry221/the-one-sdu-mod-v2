@@ -24,7 +24,7 @@ import core.Tuple;
  * <I>Probabilistic routing in intermittently connected networks</I> by
  * Anders Lindgren et al.
  */
-public class ProphetRouter extends ActiveRouter {
+public class ProphetGRTRMinRouter extends ActiveRouter {
 	/** delivery predictability initialization constant*/
 	public static final double P_INIT = 0.75;
 	/** delivery predictability transitivity scaling constant default value */
@@ -33,7 +33,7 @@ public class ProphetRouter extends ActiveRouter {
 	public static final double GAMMA = 0.98;
 	
 	/** Prophet router's setting namespace ({@value})*/ 
-	public static final String PROPHET_NS = "ProphetRouter";
+	public static final String PROPHET_NS = "ProphetGRTRMinRouter";
 	/**
 	 * Number of seconds in time unit -setting id ({@value}).
 	 * How many seconds one time unit is when calculating aging of 
@@ -61,7 +61,7 @@ public class ProphetRouter extends ActiveRouter {
 	 * the given Settings object.
 	 * @param s The settings object
 	 */
-	public ProphetRouter(Settings s) {
+	public ProphetGRTRMinRouter(Settings s) {
 		super(s);
 		Settings prophetSettings = new Settings(PROPHET_NS);
 		secondsInTimeUnit = prophetSettings.getInt(SECONDS_IN_UNIT_S);
@@ -79,7 +79,7 @@ public class ProphetRouter extends ActiveRouter {
 	 * Copyconstructor.
 	 * @param r The router prototype where setting values are copied from
 	 */
-	protected ProphetRouter(ProphetRouter r) {
+	protected ProphetGRTRMinRouter(ProphetGRTRMinRouter r) {
 		super(r);
 		this.secondsInTimeUnit = r.secondsInTimeUnit;
 		this.beta = r.beta;
@@ -137,12 +137,12 @@ public class ProphetRouter extends ActiveRouter {
 	 */
 	private void updateTransitivePreds(DTNHost host) {
 		MessageRouter otherRouter = host.getRouter();
-		assert otherRouter instanceof ProphetRouter : "PRoPHET only works " + 
+		assert otherRouter instanceof ProphetGRTRMinRouter : "PRoPHET only works " + 
 			" with other routers of same type";
 		
 		double pForHost = getPredFor(host); // P(a,b)
 		Map<DTNHost, Double> othersPreds = 
-			((ProphetRouter)otherRouter).getDeliveryPreds();
+			((ProphetGRTRMinRouter)otherRouter).getDeliveryPreds();
 		
 		for (Map.Entry<DTNHost, Double> e : othersPreds.entrySet()) {
 			if (e.getKey() == getHost()) {
@@ -218,7 +218,7 @@ public class ProphetRouter extends ActiveRouter {
 		   probability of delivery by the other host */
 		for (Connection con : getConnections()) {
 			DTNHost other = con.getOtherNode(getHost());
-			ProphetRouter othRouter = (ProphetRouter)other.getRouter();
+			ProphetGRTRMinRouter othRouter = (ProphetGRTRMinRouter)other.getRouter();
 			
 			if (othRouter.isTransferring()) {
 				continue; // skip hosts that are transferring
@@ -256,25 +256,28 @@ public class ProphetRouter extends ActiveRouter {
 		public int compare(Tuple<Message, Connection> tuple1,
 				Tuple<Message, Connection> tuple2) {
 			// delivery probability of tuple1's message with tuple1's connection
-			double p1 = ((ProphetRouter)tuple1.getValue().
+			double p1 = ((ProphetGRTRMinRouter)tuple1.getValue().
 					getOtherNode(getHost()).getRouter()).getPredFor(
 					tuple1.getKey().getTo());
 			// -"- tuple2...
-			double p2 = ((ProphetRouter)tuple2.getValue().
+			double p2 = ((ProphetGRTRMinRouter)tuple2.getValue().
 					getOtherNode(getHost()).getRouter()).getPredFor(
 					tuple2.getKey().getTo());
-
-			// bigger probability should come first
-			if (p2-p1 == 0) {
+            
+			//=================================================================
+            // Here the different!!!!!!!!!!
+			// lower probability should come first
+			if (p1-p2 == 0) {
 				/* equal probabilities -> let queue mode decide */
 				return compareByQueueMode(tuple1.getKey(), tuple2.getKey());
 			}
-			else if (p2-p1 < 0) {
+			else if (p1-p2 < 0) {
 				return -1;
 			}
 			else {
 				return 1;
 			}
+			//==================================================================
 		}
 	}
 	
@@ -299,7 +302,7 @@ public class ProphetRouter extends ActiveRouter {
 	
 	@Override
 	public MessageRouter replicate() {
-		ProphetRouter r = new ProphetRouter(this);
+		ProphetGRTRMinRouter r = new ProphetGRTRMinRouter(this);
 		return r;
 	}
 
