@@ -189,6 +189,7 @@ public abstract class MovementModel {
 	}
 
 	/**
+	 * Must override
 	 * Returns a new path by this movement model or null if no new path could
 	 * be constructed at the moment (node should wait where it is). A new
 	 * path should not be requested before the destination of the previous
@@ -198,6 +199,7 @@ public abstract class MovementModel {
 	public abstract Path getPath();
 	
 	/**
+	 * Must override
 	 * Returns a new initial placement for a node
 	 * @return The initial coordinates for a node
 	 */
